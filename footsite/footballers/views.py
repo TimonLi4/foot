@@ -1,6 +1,7 @@
 from django.shortcuts import render,HttpResponse,get_object_or_404
 from django.http import HttpResponseNotFound
 from .models import Category, Footballers, TagPost
+from .forms import AddPostForm
 # Create your views here.
 
 
@@ -50,7 +51,21 @@ def show_post(request,post_slug):
     return render(request,'footballers/post.html',data)
 
 def addpage(request):
-    return HttpResponse('Добавление статьи')
+
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+    else:
+        form = AddPostForm()
+
+    data = {
+        "menu": menu,
+        'title': "Добавить статью",
+        'form': form,
+    }
+    return render(request,'footballers/addpost.html', data)
+
 
 
 def contact(request):
