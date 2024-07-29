@@ -1,7 +1,7 @@
-from django.shortcuts import render,HttpResponse,get_object_or_404
+from django.shortcuts import redirect, render,HttpResponse,get_object_or_404
 from django.http import HttpResponseNotFound
-from .models import Category, Footballers, TagPost
-from .forms import AddPostForm
+from .models import Category, Footballers, TagPost, UploadFiles
+from .forms import AddPostForm, UploadFileForm
 # Create your views here.
 
 
@@ -33,9 +33,28 @@ def index(request):
     }
     return render(request,'footballers/index.html',data)
 
+"""def handle_upload_file(f):
+    with open(f'uploads/{f.name}','wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+"""
+
 def about(request):
+
+    if request.method =='POST':
+        
+        form = UploadFileForm(request.POST,request.FILES)
+        if form.is_valid():
+            #handle_upload_file(form.cleaned_data['file'])
+            fp = UploadFiles(file=form.cleaned_data['file'])
+            fp.save()
+    else:
+        form = UploadFileForm()
+
+
     data = {'title': 'О сайте',
             'menu': menu,
+            'form':form,
             }
     return render(request,'footballers/about.html',data)
 
@@ -51,11 +70,13 @@ def show_post(request,post_slug):
     return render(request,'footballers/post.html',data)
 
 def addpage(request):
-
     if request.method == 'POST':
-        form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
         if form.is_valid():
-            print(form.cleaned_data)
+            #print(form.cleaned_data)
+            #Footballers.objects.create(**form.cleaned_data)
+            form.save()
+            return redirect('home')
     else:
         form = AddPostForm()
 

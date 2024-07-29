@@ -12,9 +12,10 @@ class Footballers(models.Model):
     class Status(models.IntegerChoices):
         DRAFT = 0,'Черновик'
         PUBLISHED = 1,'Опубликовано'
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255,unique=True,db_index=True)
-    content = models.TextField(blank=True)
+    title = models.CharField(max_length=255,verbose_name='Оглавление:')
+    slug = models.SlugField(max_length=255,unique=True,db_index=True,verbose_name='URL:')
+    photo=models.ImageField(upload_to='photos/%Y/%m/', default=None,blank=True,null=True,verbose_name='Фото')
+    content = models.TextField(blank=True,verbose_name='Описание:')
     time_create=models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(choices=tuple(map(lambda x: (bool(x[0]),x[1]),Status.choices)), default=Status.PUBLISHED)
@@ -81,4 +82,7 @@ class Wife(models.Model):
         return self.name
     
     
-        
+
+class UploadFiles(models.Model):
+    file = models.FileField(upload_to='uploads_model')
+
